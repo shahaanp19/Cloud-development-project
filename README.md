@@ -4,15 +4,7 @@
 
 The C# Azure Functions have been implemented, but the **Azure Portal setup has NOT been completed yet**.
 
-The current Azure Storage Account is:
-
-`coffeenchillgroupproj`
-
-Its account type is:
-
-`FileStorage`
-
-This account can support **Azure File Storage** for Staff Documents, but it cannot provide **Azure Table Storage**, which is required for the Menu Item functionality.
+test the code first, there should be no issues, then create the azure portal stuff (resource group and storage account) and add the connection string to  local settings.json.
 
 ### 1. Inspect the Existing Code
 
