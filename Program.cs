@@ -8,7 +8,7 @@ var builder = FunctionsApplication.CreateBuilder(args);
 
 builder.ConfigureFunctionsWebApplication();
 
-var connectionString =
+string? connectionString =
     builder.Configuration["AzureWebJobsStorage"];
 
 if (string.IsNullOrWhiteSpace(connectionString))
@@ -21,12 +21,17 @@ builder.Services.AddSingleton(
     new TableServiceClient(connectionString));
 
 builder.Services.AddSingleton<MenuItemService>();
+builder.Services.AddSingleton(
+    new FileShareService(connectionString));
 
 var host = builder.Build();
 
-var menuItemService =
-    host.Services.GetRequiredService<MenuItemService>();
+await host.Services
+    .GetRequiredService<MenuItemService>()
+    .InitializeAsync();
 
-await menuItemService.InitializeAsync();
+await host.Services
+    .GetRequiredService<FileShareService>()
+    .InitializeAsync();
 
 host.Run();
