@@ -19,7 +19,7 @@ public class MenuItem : ITableEntity
 
     public string Description { get; set; } = string.Empty;
 
-    public decimal Price { get; set; }
+    public string Price { get; set; } = string.Empty;
 
     public bool IsAvailable { get; set; }
 }
