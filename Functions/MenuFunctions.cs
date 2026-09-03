@@ -243,8 +243,9 @@ public class MenuFunctions
                 });
             }
 
-            if (!request.Price.HasValue &&
-                !request.IsAvailable.HasValue)
+            var hasPrice = !string.IsNullOrWhiteSpace(request.Price);
+
+            if (!hasPrice && !request.IsAvailable.HasValue)
             {
                 return new BadRequestObjectResult(new
                 {
@@ -252,13 +253,16 @@ public class MenuFunctions
                 });
             }
 
-            if (request.Price.HasValue &&
-                request.Price.Value <= 0)
+            decimal parsedPrice = 0;
+            if (hasPrice)
             {
-                return new BadRequestObjectResult(new
+                if (!decimal.TryParse(request.Price, System.Globalization.CultureInfo.InvariantCulture, out parsedPrice) || parsedPrice <= 0)
                 {
-                    error = "Price must be greater than zero."
-                });
+                    return new BadRequestObjectResult(new
+                    {
+                        error = "Price must be a valid number greater than zero."
+                    });
+                }
             }
 
             await _menuItemService.InitializeAsync(cancellationToken);
@@ -276,9 +280,9 @@ public class MenuFunctions
                 });
             }
 
-            if (request.Price.HasValue)
+            if (hasPrice)
             {
-                menuItem.Price = request.Price.Value;
+                menuItem.Price = request.Price!;
             }
 
             if (request.IsAvailable.HasValue)
