@@ -1,15 +1,15 @@
 ﻿using Azure;
-using Azure.Storage.Files.Shares;
-using Azure.Storage.Files.Shares.Models;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using CoffeeNChill.Models;
 
 namespace CoffeeNChill.Services;
 
 public sealed class FileShareService
 {
-    private const string ShareName = "staff-docs";
+    private const string ContainerName = "staff-docs";
 
-    private readonly ShareClient _shareClient;
+    private readonly BlobContainerClient _containerClient;
 
     public FileShareService(string connectionString)
     {
@@ -20,15 +20,15 @@ public sealed class FileShareService
                 nameof(connectionString));
         }
 
-        _shareClient = new ShareClient(
+        _containerClient = new BlobContainerClient(
             connectionString,
-            ShareName);
+            ContainerName);
     }
 
     public async Task InitializeAsync(
         CancellationToken cancellationToken = default)
     {
-        await _shareClient.CreateIfNotExistsAsync(
+        await _containerClient.CreateIfNotExistsAsync(
             cancellationToken: cancellationToken);
     }
 
@@ -48,19 +48,12 @@ public sealed class FileShareService
                 nameof(content));
         }
 
-        ShareDirectoryClient directoryClient =
-            _shareClient.GetRootDirectoryClient();
+        BlobClient blobClient =
+            _containerClient.GetBlobClient(fileName);
 
-        ShareFileClient fileClient =
-            directoryClient.GetFileClient(fileName);
-
-        await fileClient.CreateAsync(
-            maxSize: content.Length,
-            cancellationToken: cancellationToken);
-
-        await fileClient.UploadRangeAsync(
-            new HttpRange(0, content.Length),
+        await blobClient.UploadAsync(
             content,
+            overwrite: true,
             cancellationToken: cancellationToken);
     }
 
@@ -69,32 +62,18 @@ public sealed class FileShareService
     {
         var documents = new List<StaffDocument>();
 
-        ShareDirectoryClient directoryClient =
-            _shareClient.GetRootDirectoryClient();
-
         await foreach (
-            ShareFileItem item in
-            directoryClient.GetFilesAndDirectoriesAsync(
+            BlobItem item in
+            _containerClient.GetBlobsAsync(
                 cancellationToken: cancellationToken))
         {
-            if (item.IsDirectory)
-            {
-                continue;
-            }
-
-            ShareFileClient fileClient =
-                directoryClient.GetFileClient(item.Name);
-
-            ShareFileProperties properties =
-                await fileClient.GetPropertiesAsync(
-                    cancellationToken: cancellationToken);
-
             documents.Add(
                 new StaffDocument
                 {
                     FileName = item.Name,
-                    Size = properties.ContentLength,
-                    LastModified = properties.LastModified
+                    Size = item.Properties.ContentLength ?? 0,
+                    LastModified =
+                        item.Properties.LastModified ?? default
                 });
         }
 
@@ -110,16 +89,14 @@ public sealed class FileShareService
     {
         ValidateFileName(fileName);
 
-        ShareDirectoryClient directoryClient =
-            _shareClient.GetRootDirectoryClient();
-
-        ShareFileClient fileClient =
-            directoryClient.GetFileClient(fileName);
+        BlobClient blobClient =
+            _containerClient.GetBlobClient(fileName);
 
         try
         {
-            ShareFileDownloadInfo download =
-      await fileClient.DownloadAsync();
+            BlobDownloadStreamingResult download =
+                await blobClient.DownloadStreamingAsync(
+                    cancellationToken: cancellationToken);
 
             return download.Content;
         }

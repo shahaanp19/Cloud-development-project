@@ -1,0 +1,831 @@
+{
+  "info": {
+    "_postman_id": "907e3e16-1edb-4981-983b-cb44ba909ef7",
+    "name": "CoffeeNChill",
+    "description": "Menu and staff document endpoints for the CoffeeNChill Azure Functions app, running against Azurite.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "25975441"
+  },
+  "item": [
+    {
+      "name": "Menu",
+      "item": [
+        {
+          "name": "Create Menu Item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has correct name\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.name).to.eql(\"Latte\");",
+                  "});",
+                  "",
+                  "pm.test(\"Price matches what was sent\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.price).to.eql(\"4.50\");",
+                  "});",
+                  "",
+                  "pm.test(\"Item is marked available\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.isAvailable).to.eql(true);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set(\"lastCategory\", jsonData.partitionKey);",
+                  "    pm.collectionVariables.set(\"lastId\", jsonData.rowKey);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"Coffee\",\n  \"id\": \"latte01\",\n  \"name\": \"Latte\",\n  \"description\": \"Espresso with steamed milk\",\n  \"price\": \"4.50\",\n  \"isAvailable\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/menu",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "menu"
+              ]
+            },
+            "description": "Creates a new menu item. Fails if `category` + `id` already exists.\n\nHeaders: `Content-Type: application/json`\n\nBody:\n\njson\n\n``` json\n{\n  \"category\": \"Coffee\",\n  \"id\": \"latte01\",\n  \"name\": \"Latte\",\n  \"description\": \"Espresso with steamed milk\",\n  \"price\": \"4.50\",\n  \"isAvailable\": true\n}\n\n ```\n\n| Field | Type | Rules |\n| --- | --- | --- |\n| category | string | required, 2–100 chars |\n| id | string | required, 2–50 chars |\n| name | string | required, 2–100 chars |\n| description | string | required, 5–500 chars |\n| price | string | required, 2-10 chars |\n| isAvailable | bool | required |\n\nResponses:\n\n· `201` created, returns `MenuItem` (price is a **string**, e.g. `\"4.50\"`)\n\n· `400` validation failed / malformed JSON\n\n· `409` category+id already exists"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Menu Item - Duplicate (expect 409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 409 for duplicate ID\", function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"Coffee\",\n  \"id\": \"latte01\",\n  \"name\": \"Latte\",\n  \"description\": \"Espresso with steamed milk\",\n  \"price\": \"4.50\",\n  \"isAvailable\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/menu",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "menu"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Menu Item - Invalid Body (expect 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 for invalid body\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Response includes validation details\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"C\",\n  \"id\": \"\",\n  \"name\": \"\",\n  \"description\": \"bad\",\n  \"price\": -5,\n  \"isAvailable\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/menu",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "menu"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Menu Items",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Returns an array\", function () {",
+                  "    pm.expect(pm.response.json()).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test(\"No menu item has a zeroed-out price\", function () {",
+                  "    const items = pm.response.json();",
+                  "    items.forEach((item) => {",
+                  "        pm.expect(item.price, `price for ${item.rowKey}`).to.not.eql(\"0\");",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test(\"Seeded latte01 item is present\", function () {",
+                  "    const items = pm.response.json();",
+                  "    const found = items.find((i) => i.rowKey === pm.collectionVariables.get(\"lastId\"));",
+                  "    pm.expect(found).to.not.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/menu",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "menu"
+              ]
+            },
+            "description": "Returns every menu item across all categories.\n\nResponses:\n\n· `200` array of `MenuItem` (price is a **string** on each item)\n\n· `500` unexpected error"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Menu Items By Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Returns an array\", function () {",
+                  "    pm.expect(pm.response.json()).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test(\"All items belong to requested category\", function () {",
+                  "    const items = pm.response.json();",
+                  "    items.forEach((item) => {",
+                  "        pm.expect(item.partitionKey).to.eql(pm.collectionVariables.get(\"lastCategory\"));",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/menu/category/{{lastCategory}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "menu",
+                "category",
+                "{{lastCategory}}"
+              ]
+            },
+            "description": "Path params: `category` (string, required)\n\nResponses:\n\n· `200` array of `MenuItem` for that category, empty array (not 404) if none exist"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Menu Items By Category - Unknown Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Unknown category returns 200 with empty array\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json()).to.be.an('array').that.is.empty;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/menu/category/NoSuchCategory",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "menu",
+                "category",
+                "NoSuchCategory"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Menu Item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Price was updated\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.price).to.eql(\"5.00\");",
+                  "});",
+                  "",
+                  "pm.test(\"Availability was updated\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.isAvailable).to.eql(false);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": \"5.00\",\n  \"isAvailable\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/menu/{{lastCategory}}/{{lastId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "menu",
+                "{{lastCategory}}",
+                "{{lastId}}"
+              ]
+            },
+            "description": "Partial update. Provide at least one of `price` or `isAvailable`.\n\nPath params: `category`, `id` (strings, required)\n\nBody:\n\njson\n\n``` json\n{\n  \"price\": \"5.00\",\n  \"isAvailable\": false\n}\n\n ```\n\n| Field | Type | Rules |\n| --- | --- | --- |\n| price | string? | optional, 2-10 chars |\n| isAvailable | bool? | optional |\n\nResponses:\n\n· `200` returns updated `MenuItem` (price is a **string**)\n\n· `400` neither field provided, price ≤ 0, or malformed JSON\n\n· `404` no item at that category+id"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Menu Item - Not Found (expect 404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404 for missing item\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": \"9.00\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/menu/Coffee/does-not-exist",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "menu",
+                "Coffee",
+                "does-not-exist"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Menu Item - No Fields Provided (expect 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 when no fields provided\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/menu/{{lastCategory}}/{{lastId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "menu",
+                "{{lastCategory}}",
+                "{{lastId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Menu Item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Confirmation message returned\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/menu/{{lastCategory}}/{{lastId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "menu",
+                "{{lastCategory}}",
+                "{{lastId}}"
+              ]
+            },
+            "description": "Path params: `category`, `id` (strings, required)\n\nResponses:\n\n· `200` `{ \"message\": \"Menu item deleted successfully.\" }`\n\n· `404` no item at that category+id"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Menu Item - Already Deleted (expect 404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404 for already-deleted item\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/menu/{{lastCategory}}/{{lastId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "menu",
+                "{{lastCategory}}",
+                "{{lastId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Deleted Item Is Gone",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deleted item no longer appears in category\", function () {",
+                  "    const items = pm.response.json();",
+                  "    const found = items.find((i) => i.rowKey === pm.collectionVariables.get(\"lastId\"));",
+                  "    pm.expect(found).to.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/menu/category/{{lastCategory}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "menu",
+                "category",
+                "{{lastCategory}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Documents",
+      "item": [
+        {
+          "name": "Upload Staff Document",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response confirms uploaded file name\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.fileName).to.eql(\"handbook.pdf\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/pdf"
+              },
+              {
+                "key": "X-File-Name",
+                "value": "handbook.pdf"
+              }
+            ],
+            "body": {
+              "mode": "file",
+              "file": {
+                "src": "/C:/Users/wlwes/Downloads/sample-local-pdf.pdf"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/documents/upload",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "documents",
+                "upload"
+              ]
+            },
+            "description": "Body is raw file bytes, not multipart/form-data. In Postman: Body tab → binary → select file.\n\nHeaders:\n\n| Key | Value |\n| --- | --- |\n| Content-Type | application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, image/jpeg, or image/png |\n| X-File-Name | e.g. `handbook.pdf` |\n\nResponses:\n\n· `201` `{ \"message\": \"...\", \"fileName\": \"...\", \"contentType\": \"...\" }`\n\n· `400` missing/unsupported content type, missing X-File-Name, unreadable body, or invalid filename"
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Staff Document - Missing File Name (expect 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 when X-File-Name missing\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/pdf"
+              }
+            ],
+            "body": {
+              "mode": "file",
+              "file": {
+                "src": ""
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/documents/upload",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "documents",
+                "upload"
+              ]
+            },
+            "description": "Intentionally omits X-File-Name header to confirm validation."
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Staff Document - Unsupported Type (expect 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 for unsupported content type\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/zip"
+              },
+              {
+                "key": "X-File-Name",
+                "value": "archive.zip"
+              }
+            ],
+            "body": {
+              "mode": "file",
+              "file": {
+                "src": ""
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/documents/upload",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "documents",
+                "upload"
+              ]
+            },
+            "description": "Content-Type not in AllowedContentTypes list - confirms rejection."
+          },
+          "response": []
+        },
+        {
+          "name": "List Staff Documents",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Returns an array\", function () {",
+                  "    pm.expect(pm.response.json()).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test(\"Uploaded handbook.pdf is present\", function () {",
+                  "    const docs = pm.response.json();",
+                  "    const found = docs.find((d) => d.FileName === \"handbook.pdf\");",
+                  "    pm.expect(found).to.not.be.undefined;",
+                  "});",
+                  "",
+                  "pm.test(\"Documents are sorted newest first\", function () {",
+                  "    const docs = pm.response.json();",
+                  "    for (let i = 1; i < docs.length; i++) {",
+                  "        const prev = new Date(docs[i - 1].lastModified).getTime();",
+                  "        const curr = new Date(docs[i].lastModified).getTime();",
+                  "        pm.expect(prev).to.be.at.least(curr);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/documents",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "documents"
+              ]
+            },
+            "description": "Returns all documents, sorted newest-first by `lastModified`.\n\nResponses:\n\n· `200` array of `{ fileName, size, lastModified }`"
+          },
+          "response": []
+        },
+        {
+          "name": "Download Staff Document",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Content-Type is application/pdf\", function () {",
+                  "    pm.response.to.have.header(\"Content-Type\", \"application/pdf\");",
+                  "});",
+                  "",
+                  "pm.test(\"Content-Disposition includes filename\", function () {",
+                  "    pm.response.to.have.header(\"Content-Disposition\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/documents/download/handbook.pdf",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "documents",
+                "download",
+                "handbook.pdf"
+              ]
+            },
+            "description": "Path params: `fileName` (string, required, must match an existing document exactly, no path segments)\n\nResponse headers on success: `Content-Type` (inferred from extension) · `Content-Disposition: attachment; filename=\"...\"`\n\nResponses:\n\n· `200` raw file bytes (use Postman's \"Send and Download\")\n\n· `404` not found"
+          },
+          "response": []
+        },
+        {
+          "name": "Download Staff Document - Not Found (expect 404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404 for missing document\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/documents/download/does-not-exist.pdf",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "documents",
+                "download",
+                "does-not-exist.pdf"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:7071/api"
+    },
+    {
+      "key": "lastCategory",
+      "value": "Coffee"
+    },
+    {
+      "key": "lastId",
+      "value": "latte01"
+    }
+  ]
+}

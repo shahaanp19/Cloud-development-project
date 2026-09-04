@@ -119,19 +119,25 @@ public class MenuItemService
     }
 
     public async Task<bool> DeleteAsync(
-        string category,
-        string id,
-        CancellationToken cancellationToken = default)
+    string category,
+    string id,
+    CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(category);
         ArgumentException.ThrowIfNullOrWhiteSpace(id);
 
         try
         {
+            var entity = await GetByIdAsync(category, id, cancellationToken);
+            if (entity is null)
+            {
+                return false;
+            }
+
             await _tableClient.DeleteEntityAsync(
                 category,
                 id,
-                ETag.All,
+                entity.ETag,
                 cancellationToken);
 
             return true;
