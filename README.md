@@ -1,6 +1,66 @@
 # CoffeeNChill — Next Developer Handoff
 
-## What I Have Done
+---____________________________________
+
+## What I Have Done (Dinilla)
+
+* Created the `Dockerfile` for the CoffeeNChill Azure Functions project.
+* Created the `.dockerignore` file.
+* Created the `docker-entrypoint.sh` file.
+* Built the CoffeeNChill Functions Docker image successfully.
+* Set up the Azurite storage emulator using Docker.
+* Created and configured a Docker network for communication between the CoffeeNChill Functions container and the Azurite container.
+* Worked on the storage connection between the Functions container and Azurite.
+* Fixed the storage connection issue.
+* Successfully started the CoffeeNChill Functions Docker container and confirmed that all 8 required Functions load correctly.
+* Verified that all required HTTP routes are registered when the container starts.
+* Tested the running Functions container and successfully received a response from the `GET /api/menu` endpoint.
+* Tagged the CoffeeNChill Functions image as `dinillapaulse/coffeenchill-functions:v1.0`.
+* Tagged the Azurite image as `dinillapaulse/coffeenchill-azurite:v1.0`.
+* Successfully pushed both images to Docker Hub.
+* Successfully tested the standalone Functions container using the exact Docker command from the assignment:
+
+`docker run -p 7071:80 -e AzureWebJobsStorage="UseDevelopmentStorage=true" dinillapaulse/coffeenchill-functions:v1.0`
+
+---
+
+## What Still Needs to Be Done
+
+### Fix the Azure Storage Warning
+
+* Investigate the `Unhealthy` WebJobs Storage check.
+* Confirm that Table Storage works correctly inside the container.
+
+### Fix the Azure File Share Requirement
+
+* The assignment requires the `staff-docs` Azure File Share.
+* The current implementation uses Blob Storage, so this needs to be resolved.
+
+### Check Staff Document Upload
+
+* Make sure `UploadStaffDocument` uses `multipart/form-data`.
+* Test upload, list and download.
+
+### Resolve the Menu Price Issue
+
+* The assignment requires a numeric price.
+* The current implementation uses `string`, so this needs to be resolved.
+
+### Test All API Endpoints
+
+* Import the Postman collection.
+* Run all endpoint tests.
+* Fix any failed tests and confirm they pass.
+
+### Check the Final Docker Setup
+
+* Make sure the final code works correctly in Docker.
+* Test the exact assignment Docker command.
+* Rebuild and push the final Docker image after all code changes.
+________________________________________________________________________
+
+
+## What I Have Done(Wesley)
 
 - Rewrote FileShareService to use Azure blob storage instead of Azure file storage. This is because Azurite does not support file storage, which is needed for the Staff Document functionality.
 - Updated all menu item functions to use price as a string instead of a decimal as azure tables do not support decimal types. 
