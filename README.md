@@ -1,139 +1,107 @@
-# CoffeeNChill — Next Developer Handoff
-
----____________________________________
-
-## What I Have Done (Dinilla)
-
-* Created the `Dockerfile` for the CoffeeNChill Azure Functions project.
-* Created the `.dockerignore` file.
-* Created the `docker-entrypoint.sh` file.
-* Built the CoffeeNChill Functions Docker image successfully.
-* Set up the Azurite storage emulator using Docker.
-* Created and configured a Docker network for communication between the CoffeeNChill Functions container and the Azurite container.
-* Worked on the storage connection between the Functions container and Azurite.
-* Fixed the storage connection issue.
-* Successfully started the CoffeeNChill Functions Docker container and confirmed that all 8 required Functions load correctly.
-* Verified that all required HTTP routes are registered when the container starts.
-* Tested the running Functions container and successfully received a response from the `GET /api/menu` endpoint.
-* Tagged the CoffeeNChill Functions image as `dinillapaulse/coffeenchill-functions:v1.0`.
-* Tagged the Azurite image as `dinillapaulse/coffeenchill-azurite:v1.0`.
-* Successfully pushed both images to Docker Hub.
-* Successfully tested the standalone Functions container using the exact Docker command from the assignment:
-
-`docker run -p 7071:80 -e AzureWebJobsStorage="UseDevelopmentStorage=true" dinillapaulse/coffeenchill-functions:v1.0`
+# CoffeeNChill
 
 ---
 
-## What Still Needs to Be Done
+## Remaining Work
 
-### Fix the Azure Storage Warning
+### 1. Verify the Storage Warning
 
-* Investigate the `Unhealthy` WebJobs Storage check.
-* Confirm that Table Storage works correctly inside the container.
+- Investigate the `Unhealthy` WebJobs Storage warning.
+- Confirm that the application can successfully connect to the configured storage service.
+- Verify that Table Storage operations work correctly from the running application/container.
+- Confirm that the storage configuration is suitable for the final Azure deployment.
+- Ensure there are no unresolved storage health warnings before final submission.
 
-### Fix the Azure File Share Requirement
+---
 
-* The assignment requires the `staff-docs` Azure File Share.
-* The current implementation uses Blob Storage, so this needs to be resolved.
+### 2. Verify the Staff-Document Implementation
 
-### Check Staff Document Upload
+- Inspect the current `FileShareService` implementation.
+- Confirm how staff documents are currently being stored.
+- Verify whether the implementation fully satisfies the assignment requirements for Azure File Share storage.
+- The current implementation was changed to use Blob Storage because Azurite does not support the required Azure File Share functionality.
+- Determine whether the final Azure implementation must use an actual Azure File Share.
+- Verify `UploadStaffDocument`.
+- Confirm that staff document uploads use `multipart/form-data` where required.
+- Test document upload.
+- Test document listing.
+- Test document download.
+- Confirm appropriate error handling for missing or invalid documents.
+- Ensure the final implementation is fully aligned with the assignment requirements.
 
-* Make sure `UploadStaffDocument` uses `multipart/form-data`.
-* Test upload, list and download.
+---
 
-### Resolve the Menu Price Issue
+### 3. Run the Supplied Postman Collection
 
-* The assignment requires a numeric price.
-* The current implementation uses `string`, so this needs to be resolved.
+- Import `CoffeeNChill.postman_collection.json` into Postman.
+- Run the supplied requests against the application.
+- Test all API endpoints.
+- Verify successful responses.
+- Verify expected error responses.
+- Check status codes.
+- Check request and response bodies.
+- Record and resolve any failing requests.
+- Confirm that all supplied Postman tests pass before final submission.
 
-### Test All API Endpoints
+---
 
-* Import the Postman collection.
-* Run all endpoint tests.
-* Fix any failed tests and confirm they pass.
+### 4. Later: Azure / CD
 
-### Check the Final Docker Setup
+- Configure the final Azure environment.
+- Verify the required Azure resources.
+- Deploy the application to Azure.
+- Confirm the deployed Functions application starts correctly.
 
-* Make sure the final code works correctly in Docker.
-* Test the exact assignment Docker command.
-* Rebuild and push the final Docker image after all code changes.
-________________________________________________________________________
+---
+
+# Next Person - Final Project Checks
+
+The next person taking over the project must perform a complete final review against the assignment rubric.
+
+## Rubric Compliance
+
+- [ ] Obtain the latest version of the assignment rubric.
+- [ ] Review every section of the rubric individually.
+- [ ] Confirm that every required section has been implemented.
+- [ ] Confirm that every requirement within each section has been fully completed.
+- [ ] Check that no rubric requirements have been overlooked.
+- [ ] Verify that the implementation matches the wording of the rubric, not just the general project requirements.
+- [ ] Identify any incomplete, partially implemented, or non-compliant requirements.
+- [ ] Fix any remaining rubric issues.
+
+## Final Functional Checks
+
+- [ ] Verify all API endpoints.
+- [ ] Verify menu functionality.
+- [ ] Verify menu price validation.
+- [ ] Verify staff-document functionality.
+- [ ] Verify storage functionality.
+- [ ] Verify error handling.
+- [ ] Run the complete Postman collection.
+- [ ] Run all unit tests.
+- [ ] Confirm all unit tests pass.
+- [ ] Confirm the GitHub Actions CI pipeline passes.
+- [ ] Verify the final Docker setup.
+- [ ] Verify the Azure deployment.
+- [ ] Verify Continuous Deployment if required.
+- [ ] Test the deployed application.
+- [ ] Confirm there are no unresolved warnings or errors.
+
+## Final Submission Review
+
+- [ ] Review the entire codebase for unfinished work.
+- [ ] Remove unnecessary files or development artifacts.
+- [ ] Confirm the correct files are committed to `main`.
+- [ ] Confirm the repository contains the required documentation.
+- [ ] Confirm screenshots/evidence required by the rubric are available.
+- [ ] Confirm Postman evidence is available if required.
+- [ ] Confirm unit-testing evidence is available.
+- [ ] Confirm CI/CD evidence is available.
+- [ ] Confirm Docker evidence is available.
+- [ ] Confirm Azure deployment evidence is available.
+- [ ] Perform one final review of every rubric section.
+- [ ] Ensure every section is fully completed before submission.
+
+---
 
 
-## What I Have Done(Wesley)
-
-- Rewrote FileShareService to use Azure blob storage instead of Azure file storage. This is because Azurite does not support file storage, which is needed for the Staff Document functionality.
-- Updated all menu item functions to use price as a string instead of a decimal as azure tables do not support decimal types. 
-- updated the UpdateMenuItem function to use this string price instead of a decimal price, and added checks for the parsing that takes place
-- Fixed Bug in DeleteMenuItem function that was causing the function to always return 200 even when the file was already deleted/not found. Now returns 404 when the file is not found and 200 when the file is deleted successfully.
-- Wrote Postman API collection for all functions in the project, including tests for all functions. This collection has been included as CoffeeNChill.postman_collection.json and can be imported into Postman to test the API endpoints.
-
-## What You Need To Do
-
-### 1. Inspect the Existing Code
-
-Before making changes, inspect the storage-related code, especially:
-
-- `Program.cs`
-- `local.settings.json`
-- `*.csproj`
-- `Services/FileShareService.cs`
-- `Models/StaffDocument.cs`
-- `Functions/Documents/`
-- All Menu Item Functions and their related services
-
-Determine how the project currently expects to connect to Azure File Storage and Azure Table Storage.
-
-- Note that the project will throw an exception (or atleast it should) until you setup docker
-
-### 2. Download and Install docker if you havent already. 
-
-- You can download it from [Docker's official website](https://www.docker.com/products/docker-desktop/).
-- You will also probably need WSL 2 if you are on Windows. You can follow the instructions [here](https://docs.microsoft.com/en-us/windows/wsl/install).
-- Ensure that docker is running then use this command in powershell (if you are using docker desktop you will probably need to keep the app itself open for the engine to run: 
-```powershell
-docker run -d --name azurite -p 10000:10000 -p 10001:10001 -p 10002:10002 -v azurite-data:/data mcr.microsoft.com/azure-storage/azurite azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0 --location /data
-```
-- Check that it is running with this powershell command (you would actually also see it in the docker desktop app without this command so its up to you): 
-```powershell
-docker ps
-```
-- Run the CoffeeNChill project and ensure that it connects to the Azurite storage emulator without throwing exceptions. You should see something like this:
-```cmd
-Functions:
-
-        CreateMenuItem: [POST] http://localhost:7069/api/menu
-
-        DeleteMenuItem: [DELETE] http://localhost:7069/api/menu/{category}/{id}
-
-        DownloadStaffDocument: [GET] http://localhost:7069/api/documents/download/{fileName}
-
-        GetAllMenuItems: [GET] http://localhost:7069/api/menu
-
-        GetMenuItemsByCategory: [GET] http://localhost:7069/api/menu/category/{category}
-
-        ListStaffDocuments: [GET] http://localhost:7069/api/documents
-
-        UpdateMenuItem: [PUT] http://localhost:7069/api/menu/{category}/{id}
-
-        UploadStaffDocument: [POST] http://localhost:7069/api/documents/upload
-  ```
-- Pay attention to the port number in the URLs above. It may be different for you depending on your local setup. Make sure to use the correct port number when testing the API endpoints in Postman, you might need to change the base url variable in the postman variable tab.
-
-### 3. Test the API Endpoints
-
-- Import the CoffeeNChill.postman_collection.json into Postman, you can find the collection file in the docs folder.
-- The endpoints all have documentation and tests included in the collection.
-- Use the collection to test all API endpoints and ensure they are functioning as expected. you generally have to just click send and the tests will run automatically. some of the staff document endpoints will require you to upload a file first before you can download it or list it.
-- If everything is working correctly, you should see all tests pass in Postman.
-
-### 4. Azure Functions Containerization (this part is just rewritten from the poe doc)
-
-- Write a Dockerfile in the Azure functions project root directory. Package the compiled c# project using the offical Azure Functions base runtime.
-- Build and tag the image then push it to the public Docker Hub repository. (We dont have one so you will need to make one)
-  - docker build -t yourdockerhubusername/coffeenchill-functions:v1.0
-
-### 5. Running Standalone Function Container (this part is just rewritten from the poe doc)
-
-- Run the function container independently, passing environment variables so it connects to the Azurite container host:
-  - docker run -p 7071:80 -e AzureWebJobsStorage="UseDevelopmentStorage=true" yourdockerhubusername/coffeenchill-functions:v1.0
