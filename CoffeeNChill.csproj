@@ -9,7 +9,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Content Include="local.settings.json" />
+		<Content Include="local.settings.json" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -25,7 +25,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include=".vscode\" />
+		<Folder Include=".vscode\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Remove="CoffeeNChill.Tests\**" />
+		<None Remove="CoffeeNChill.Tests\**" />
+		<Content Remove="CoffeeNChill.Tests\**" />
 	</ItemGroup>
 
 </Project>
