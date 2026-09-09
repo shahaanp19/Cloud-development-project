@@ -21,7 +21,7 @@ public class CreateMenuItemRequest
     public string Description { get; set; } = string.Empty;
 
     [Required]
-    [StringLength(10, MinimumLength = 3)]
+    [PositivePrice]
     public string Price { get; set; } = string.Empty;
 
     public bool IsAvailable { get; set; }
