@@ -46,3 +46,8 @@ await host.Services
     .InitializeAsync();
 
 host.Run();
+
+//ggailey777 (2024). Use dependency injection in .NET Azure Functions. [online] Microsoft.com. Available at: https://learn.microsoft.com/en-us/azure/azure-functions/functions-dotnet-dependency-injection [Accessed 10 Sept. 2026].
+//MicrosoftLearn. (2025). Azure Function isolated worker - how to run code on start up - Microsoft Q&A. [online] Available at: https://learn.microsoft.com/en-us/answers/questions/5534310/azure-function-isolated-worker-how-to-run-code-on [Accessed 10 Sept. 2026].
+//gewarren (2026). Dependency injection - .NET. [online] Microsoft.com. Available at: https://learn.microsoft.com/en-us/dotnet/core/extensions/dependency-injection/overview [Accessed 10 Sept. 2026].
+//tdykstra (2024). Dependency injection in ASP.NET Core. [online] Microsoft.com. Available at: https://learn.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-10.0 [Accessed 10 Sept. 2026].
