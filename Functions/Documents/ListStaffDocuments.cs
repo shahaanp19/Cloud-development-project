@@ -83,3 +83,7 @@ public sealed class ListStaffDocuments
         return response;
     }
 }
+
+//ggailey777 (2026). Guide for running C# Azure Functions in an isolated worker process. [online] MicrosoftLearn. Available at: https://learn.microsoft.com/en-us/azure/azure-functions/dotnet-isolated-process-guide?tabs=ihostapplicationbuilder%2Cconfig%2Cwindows#dependency-injection [Accessed 10 Sept. 2026].
+//ggailey777 (2025). Azure Functions HTTP trigger. [online] MicrosoftLearn. Available at: https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-http-webhook-trigger [Accessed 10 Sept. 2026].
+//jviau (2026). Overview of Durable Functions in .NET Isolated Worker. [online] MicrosoftLearn. Available at: https://learn.microsoft.com/en-us/azure/durable-task/durable-functions/durable-functions-dotnet-isolated-overview [Accessed 10 Sept. 2026].
