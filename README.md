@@ -104,4 +104,15 @@ The next person taking over the project must perform a complete final review aga
 
 ---
 
+# References
 
+//ggailey777 (2026). Guide for running C# Azure Functions in an isolated worker process. [online] MicrosoftLearn. Available at: https://learn.microsoft.com/en-us/azure/azure-functions/dotnet-isolated-process-guide?tabs=ihostapplicationbuilder%2Cconfig%2Cwindows#dependency-injection [Accessed 10 Sept. 2026].
+//ggailey777 (2025). Azure Functions HTTP trigger. [online] MicrosoftLearn. Available at: https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-http-webhook-trigger [Accessed 10 Sept. 2026].
+//jviau (2026). Overview of Durable Functions in .NET Isolated Worker. [online] MicrosoftLearn. Available at: https://learn.microsoft.com/en-us/azure/durable-task/durable-functions/durable-functions-dotnet-isolated-overview [Accessed 10 Sept. 2026].
+// azure-sdk (2026). ITableEntity Interface (Azure.Data.Tables) - Azure for .NET Developers. [online] MicrosoftLearn. Available at: https://learn.microsoft.com/en-us/dotnet/api/azure.data.tables.itableentity?view=azure-dotnet [Accessed 10 Sept. 2026].
+// azure-sdk (2026). TableEntity Class (Azure.Data.Tables) - Azure for .NET Developers. [online] MicrosoftLearn. Available at: https://learn.microsoft.com/en-us/dotnet/api/azure.data.tables.tableentity?view=azure-dotnet [Accessed 10 Sept. 2026].
+// azure-sdk (2026). TableEntity Class (Azure.Data.Tables) - Azure for .NET Developers. [online] MicrosoftLearn. Available at: https://learn.microsoft.com/en-us/dotnet/api/azure.data.tables.tableentity?view=azure-dotnet [Accessed 10 Sept. 2026].
+//ggailey777 (2024). Use dependency injection in .NET Azure Functions. [online] Microsoft.com. Available at: https://learn.microsoft.com/en-us/azure/azure-functions/functions-dotnet-dependency-injection [Accessed 10 Sept. 2026].
+//MicrosoftLearn. (2025). Azure Function isolated worker - how to run code on start up - Microsoft Q&A. [online] Available at: https://learn.microsoft.com/en-us/answers/questions/5534310/azure-function-isolated-worker-how-to-run-code-on [Accessed 10 Sept. 2026].
+//gewarren (2026). Dependency injection - .NET. [online] Microsoft.com. Available at: https://learn.microsoft.com/en-us/dotnet/core/extensions/dependency-injection/overview [Accessed 10 Sept. 2026].
+//tdykstra (2024). Dependency injection in ASP.NET Core. [online] Microsoft.com. Available at: https://learn.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-10.0 [Accessed 10 Sept. 2026].
